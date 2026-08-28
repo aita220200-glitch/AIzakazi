@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Market — ИИ на заказ</title>
+<script src="config.js"></script>
+<style>
+  :root {
+    --bg: #0a0a1a;
+    --bg2: #0f0f2a;
+    --bg3: #14143a;
+    --neon: #7c3aed;
+    --neon2: #3b82f6;
+    --neon3: #06b6d4;
+    --neon4: #8b5cf6;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --border: rgba(124,58,237,0.25);
+    --glow: 0 0 20px rgba(124,58,237,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  a { color: var(--neon4); text-decoration: none; }
+  a:hover { color: var(--neon3); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 3px; }
+
+  /* Header */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10,10,26,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+  nav {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--neon), var(--neon3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .logo span { -webkit-text-fill-color: var(--neon4); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    color: var(--text2);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: linear-gradient(135deg, var(--neon), var(--neon2));
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  /* Mobile nav */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+  .hamburger span {
+    width: 24px; height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+  @media (max-width: 768px) {
+    .hamburger { display: flex; }
+    .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0; background: rgba(10,10,26,0.97); flex-direction: column; padding: 1.5rem; gap: 1rem; border-bottom: 1px solid var(--border); }
+    .nav-links.open { display: flex; }
+  }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 20%; right: 10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Grid background */
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,58,237,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 900px; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    color: var(--neon4);
+    margin-bottom: 2rem;
+    font-weight: 500;
+  }
+  .hero-badge .dot {
+    width: 8px; height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.3); }
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 .gradient-text {
+    background: linear-gradient(135deg, var(--neon), var(--neon3), var(--neon2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: 1.2rem;
+    color: var(--text2);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+  }
+  .hero-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--neon), var(--neon2));
+    color: #fff;
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,58,237,0.4); }
+  .btn-secondary {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.85rem 2rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--neon); }
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--neon), var(--neon3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 0.85rem; color: var(--text3); margin-top: 0.25rem; }
+
+  /* Sections */
+  section { padding: 6rem 2rem; }
+  .container { max-width: 1280px; margin: 0 auto; }
+  .section-label {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--neon4);
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 1rem;
+  }
+  .section-subtitle {
+    color: var(--text2);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin-bottom: 3rem;
+    line-height: 1.7;
+  }
+
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--neon), var(--neon3));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover { border-color: rgba(124,58,237,0.5); transform: translateY(-4px); box-shadow: var(--glow); }
+  .card:hover::before { opacity: 1; }
+  .card-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    background: rgba(124,58,237,0.15);
+  }
+  .card-icon.icon-blue { background: rgba(59,130,246,0.15); }
+  .card-icon.icon-cyan { background: rgba(6,182,212,0.15); }
+  .card-icon.icon-green { background: rgba(34,197,94,0.15); }
+  .card-icon.icon-orange { background: rgba(249,115,22,0.15); }
+  .card-icon.icon-pink { background: rgba(236,72,153,0.15); }
+  .card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .card p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; margin-bottom: 1rem; }
+  .card-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 100px;
+    background: rgba(124,58,237,0.15);
+    color: var(--neon4);
+    font-weight: 600;
+  }
+  .card-price {
+    font-size: 0.85rem;
+    color: var(--text3);
+    margin-top: 0.75rem;
+  }
+  .card-price strong { color: var(--text); font-size: 1.1rem; }
+
+  /* CTA section */
+  .cta-section {
+    background: linear-gradient(135deg, var(--bg2), var(--bg3));
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Builder section */
+  .builder-demo {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .builder-header {
+    background: var(--bg3);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .builder-dots { display: flex; gap: 6px; }
+  .builder-dots span { width: 12px; height: 12px; border-radius: 50%; }
+  .builder-dots span:nth-child(1) { background: #ef4444; }
+  .builder-dots span:nth-child(2) { background: #f59e0b; }
+  .builder-dots span:nth-child(3) { background: #22c55e; }
+  .builder-title { font-size: 0.85rem; color: var(--text2); flex: 1; text-align: center; }
+  .builder-body { padding: 2rem; }
+  .builder-flow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  .builder-node {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .builder-node.start { border-color: var(--neon); color: var(--neon4); }
+  .builder-node.action { border-color: var(--neon2); color: var(--neon2); }
+  .builder-node.ai { border-color: var(--neon3); color: var(--neon3); }
+  .builder-node.output { border-color: #22c55e; color: #22c55e; }
+  .builder-arrow { color: var(--text3); font-size: 1.2rem; }
+  .builder-code {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 1.8;
+    max-height: 200px;
+    overflow: auto;
+  }
+  .builder-code .kw { color: var(--neon4); }
+  .builder-code .str { color: #22c55e; }
+  .builder-code .cm { color: var(--text3); }
+  .builder-code .fn { color: var(--neon3); }
+
+  /* Pricing */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .pricing-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .pricing-card.featured {
+    border-color: var(--neon);
+    background: linear-gradient(180deg, rgba(124,58,237,0.08) 0%, var(--bg2) 100%);
+  }
+  .pricing-card.featured::before {
+    content: 'Популярный';
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--neon), var(--neon2));
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 1rem;
+    border-radius: 100px;
+  }
+  .pricing-card:hover { transform: translateY(-4px); box-shadow: var(--glow); }
+  .pricing-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .pricing-desc { font-size: 0.85rem; color: var(--text2); margin-bottom: 1.5rem; line-height: 1.6; }
+  .pricing-price { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.25rem; }
+  .pricing-price span { font-size: 1rem; font-weight: 400; color: var(--text3); }
+  .pricing-period { font-size: 0.85rem; color: var(--text3); margin-bottom: 1.5rem; }
+  .pricing-features { list-style: none; margin-bottom: 2rem; }
+  .pricing-features li {
+    font-size: 0.88rem;
+    color: var(--text2);
+    padding: 0.4rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .pricing-features li::before {
+    content: '✓';
+    color: #22c55e;
+    font-weight: 700;
+  }
+  .pricing-features li.missing { color: var(--text3); }
+  .pricing-features li.missing::before { content: '–'; color: var(--text3); }
+  .pricing-btn {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+  }
+  .pricing-btn.primary {
+    background: linear-gradient(135deg, var(--neon), var(--neon2));
+    color: #fff;
+  }
+  .pricing-btn.primary:hover { opacity: 0.85; transform: translateY(-1px); }
+  .pricing-btn.ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .pricing-btn.ghost:hover { border-color: var(--neon); background: rgba(124,58,237,0.1); }
+
+  /* Freelancers */
+  .freelancer-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+  }
+  .freelancer-card:hover { border-color: rgba(124,58,237,0.5); transform: translateY(-3px); }
+  .freelancer-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .freelancer-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, var(--neon), var(--neon2));
+    color: #fff;
+  }
+  .freelancer-name { font-weight: 700; font-size: 1rem; }
+  .freelancer-role { font-size: 0.8rem; color: var(--neon4); }
+  .freelancer-stars { color: #f59e0b; font-size: 0.85rem; margin-top: 0.2rem; }
+  .freelancer-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .freelancer-tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    background: rgba(124,58,237,0.1);
+    color: var(--neon4);
+    font-weight: 500;
+  }
+  .freelancer-bio { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
+  .freelancer-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .freelancer-rate { font-size: 0.8rem; color: var(--text3); }
+  .freelancer-rate strong { color: var(--text); font-size: 1rem; }
+  .freelancer-btn {
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    color: var(--neon4);
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .freelancer-btn:hover { background: rgba(124,58,237,0.25); }
+
+  /* Order form */
+  .order-section { background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); }
+  .order-form {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 0.5rem;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--neon);
+  }
+  .form-select { appearance: none; cursor: pointer; }
+  .form-textarea { resize: vertical; min-height: 100px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-submit {
+    width: 100%;
+    background: linear-gradient(135deg, var(--neon), var(--neon2));
+    color: #fff;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+  }
+  .form-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,58,237,0.4); }
+  .form-note { font-size: 0.78rem; color: var(--text3); text-align: center; margin-top: 1rem; }
+
+  /* Success toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--bg3);
+    border: 1px solid #22c55e;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    transform: translateY(120%);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .toast.show { transform: translateY(0); }
+  .toast-icon { color: #22c55e; font-size: 1.2rem; }
+
+  /* Footer */
+  footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+  }
+  .footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2rem;
+  }
+  @media (max-width: 768px) {
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+  .footer-brand p { font-size: 0.85rem; color: var(--text3); margin-top: 0.5rem; line-height: 1.6; }
+  .footer-col h4 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 1rem; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 0.5rem; }
+  .footer-col ul li a { color: var(--text2); font-size: 0.88rem; }
+  .footer-col ul li a:hover { color: var(--text); }
+  .footer-bottom {
+    max-width: 1280px;
+    margin: 2rem auto 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text3);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; justify-content: center; flex-wrap: wrap; }
+  .tab {
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab:hover { border-color: var(--neon); color: var(--text); }
+  .tab.active {
+    background: rgba(124,58,237,0.2);
+    border-color: var(--neon);
+    color: var(--neon4);
+  }
+
+  /* Divider */
+  .section-divider {
+    max-width: 1280px;
+    margin: 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <nav>
+    <div class="logo">AI<span>Market</span></div>
+    <ul class="nav-links" id="navLinks">
+      <li><a onclick="handleNavClick('catalog')">Каталог</a></li>
+      <li><a onclick="handleNavClick('order')">Заказать</a></li>
+      <li><a onclick="handleNavClick('builder')">Конструктор</a></li>
+      <li><a onclick="handleNavClick('freelancers')">Фрилансеры</a></li>
+      <li><a onclick="handleNavClick('pricing')">Цены</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <button class="nav-cta" data-action="nav-order" onclick="handleAction('nav-order', this)">Оставить заявку</button>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <div class="grid-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge animate">
+      <div class="dot"></div>
+      Новые AI-агенты каждую неделю
+    </div>
+    <h1 class="animate delay-1">
+      ИИ на заказ<br>
+      <span class="gradient-text">без кода</span>
+    </h1>
+    <p class="animate delay-2">
+      Закажите уникального AI-агента под задачу, выберите готовое решение или соберите своего бота в визуальном конструкторе.
+    </p>
+    <div class="hero-btns animate delay-3">
+      <button class="btn-primary" data-action="hero-order" onclick="handleAction('hero-order', this)">
+        🚀 Заказать AI
+      </button>
+      <button class="btn-secondary" data-action="hero-catalog" onclick="handleAction('hero-catalog', this)">
+        Смотреть каталог →
+      </button>
+    </div>
+    <div class="hero-stats animate delay-4">
+      <div class="stat-item">
+        <div class="stat-value">500+</div>
+        <div class="stat-label">AI-агентов создано</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">120+</div>
+        <div class="stat-label">Фрилансеров</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">98%</div>
+        <div class="stat-label">Довольных клиентов</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">24ч</div>
+        <div class="stat-label">Среднее время запуска</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Catalog -->
+<section id="catalog">
+  <div class="container">
+    <div style="text-align:center">
+      <div class="section-label">Каталог</div>
+      <h2 class="section-title">Готовые AI-агенты</h2>
+      <p class="section-subtitle" style="margin-left:auto;margin-right:auto">
+        Выберите из десятков готовых решений для бизнеса, маркетинга, аналитики и не только
+      </p>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="filterCatalog('all', this)">Все</button>
+      <button class="tab" onclick="filterCatalog('business', this)">Бизнес</button>
+      <button class="tab" onclick="filterCatalog('marketing', this)">Маркетинг</button>
+      <button class="tab" onclick="filterCatalog('support', this)">Поддержка</button>
+      <button class="tab" onclick="filterCatalog('data', this)">Данные</button>
+    </div>
+    <div class="cards-grid" id="catalogGrid">
+      <!-- JS populate -->
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- How it works -->
+<section id="how">
+  <div class="container" style="text-align:center">
+    <div class="section-label">Процесс</div>
+    <h2 class="section-title">Как это работает</h2>
+    <p class="section-subtitle" style="margin-left:auto;margin-right:auto;margin-bottom:3rem">
+      Три простых шага от идеи до работающего AI за 24 часа
+    </p>
+    <div class="cards-grid" style="max-width:900px;margin:0 auto">
+      <div class="card" style="text-align:left">
+        <div class="card-icon">💬</div>
+        <h3>Опишите задачу</h3>
+        <p>Заполните бриф: что должен делать агент, какие данные обрабатывать, с какими системами интегрироваться.</p>
+      </div>
+      <div class="card" style="text-align:left">
+        <div class="card-icon icon-blue">🔧</div>
+        <h3>Разработка</h3>
+        <p>Фрилансер проектирует архитектуру, обучает или настраивает модель, интегрирует с вашими сервисами.</p>
+      </div>
+      <div class="card" style="text-align:left">
+        <div class="card-icon icon-cyan">🚀</div>
+        <h3>Запуск и поддержка</h3>
+        <p>Тестируем, запускаем и остаёмся на связи. Корректировки и доработки — по запросу.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Order section -->
+<section class="order-section" id="order">
+  <div class="container">
+    <div style="text-align:center">
+      <div class="section-label">Заказать</div>
+      <h2 class="section-title">Создайте AI под себя</h2>
+      <p class="section-subtitle" style="margin-left:auto;margin-right:auto;margin-bottom:2.5rem">
+        Заполните форму — мы подберём исполнителя и свяжем вас в течение 2 часов
+      </p>
+    </div>
+    <form class="order-form" id="orderForm" onsubmit="submitOrder(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ваше имя *</label>
+          <input type="text" class="form-input" placeholder="Иван Петров" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input type="email" class="form-input" placeholder="ivan@company.com" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Телеграм / ник</label>
+          <input type="text" class="form-input" placeholder="@username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Бюджет</label>
+          <select class="form-select" id="budgetSelect">
+            <option value="">Выберите диапазон</option>
+            <option value="small">до $200</option>
+            <option value="medium">$200 – $500</option>
+            <option value="large">$500 – $1 500</option>
+            <option value="enterprise">от $1 500</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Тип AI-агента *</label>
+        <select class="form-select" required>
+          <option value="">Выберите категорию</option>
+          <option>Чат-бот для клиентской поддержки</option>
+          <option>AI для обработки документов</option>
+          <option>Автоматизация маркетинга</option>
+          <option>Аналитический агент</option>
+          <option>Голосовой ассистент</option>
+          <option>Персональный AI-помощник</option>
+          <option>Бот для Telegram / Discord</option>
+          <option>Рекомендательная система</option>
+          <option>Другое</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Опишите задачу *</label>
+        <textarea class="form-textarea" placeholder="Что должен делать агент? Какие задачи решать? С какими системами интегрироваться? Есть ли особые требования к языку модели, точности или скорости?" required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Хотите видеть процесс?</label>
+        <select class="form-select">
+          <option>Да, хочу участвовать в разработке</option>
+          <option>Нет, сделайте и покажите результат</option>
+        </select>
+      </div>
+      <button type="submit" class="form-submit">Отправить заявку →</button>
+      <p class="form-note">Ответ в течение 2 часов · Без спама · Можно без регистрации</p>
+    </form>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Agent Builder -->
+<section id="builder">
+  <div class="container" style="text-align:center">
+    <div class="section-label">Конструктор</div>
+    <h2 class="section-title">Соберите AI без кода</h2>
+    <p class="section-subtitle" style="margin-left:auto;margin-right:auto;margin-bottom:3rem">
+      Визуальный конструктор: выберите модули, задайте логику — получите готового агента
+    </p>
+
+    <div class="builder-demo">
+      <div class="builder-header">
+        <div class="builder-dots"><span></span><span></span><span></span></div>
+        <div class="builder-title">agent-builder.aimarket.ai</div>
+      </div>
+      <div class="builder-body">
+        <div class="builder-flow" id="builderFlow">
+          <div class="builder-node start">🚀 Триггер</div>
+          <div class="builder-arrow">→</div>
+          <div class="builder-node action">📥 Ввод данных</div>
+          <div class="builder-arrow">→</div>
+          <div class="builder-node ai">🤖 AI Модель</div>
+          <div class="builder-arrow">→</div>
+          <div class="builder-node output">📤 Ответ</div>
+        </div>
+
+        <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;justify-content:center">
+          <button class="tab active" onclick="setBuilderPreset('support', this)">Поддержка</button>
+          <button class="tab" onclick="setBuilderPreset('sales', this)">Продажи</button>
+          <button class="tab" onclick="setBuilderPreset('analyze', this)">Аналитика</button>
+          <button class="tab" onclick="setBuilderPreset('custom', this)">Свой</button>
+        </div>
+
+        <div class="builder-code" id="builderCode">
+<span class="cm">// Поддержка клиентов v1.0</span>
+<span class="kw">trigger</span> <span class="fn">on_message</span>(<span class="str">"telegram"</span>)
+
+<span class="kw">step</span> <span class="fn">classify</span>(
+  message,
+  categories=[<span class="str">"вопрос"</span>, <span class="str">"жалоба"</span>, <span class="str">"заказ"</span>]
+)
+
+<span class="kw">if</span> category == <span class="str">"жалоба"</span>:
+  <span class="kw">step</span> <span class="fn">summarize</span>(message, max_words=<span class="str">20</span>)
+  <span class="kw">step</span> <span class="fn">escalate</span>(team=<span class="str">"support"</span>, priority=<span class="str">"high"</span>)
+  <span class="kw">step</span> <span class="fn">reply</span>(<span class="str">"Принято! Мы уже работаем над вашим вопросом 🎯"</span>)
+
+<span class="kw">if</span> category == <span class="str">"вопрос"</span>:
+  <span class="kw">step</span> <span class="fn">search_kb</span>(query=message, top_k=<span class="str">3</span>)
+  <span class="kw">step</span> <span class="fn">reply</span>(answer, style=<span class="str">"friendly"</span>)
+
+<span class="kw">if</span> category == <span class="str">"заказ"</span>:
+  <span class="kw">step</span> <span class="fn">create_order</span>(data=message)
+  <span class="kw">step</span> <span class="fn">notify</span>(channel=<span class="str">"sales"</span>, message=order_id)
+</div>
+
+        <div style="margin-top:1.5rem">
+          <button class="btn-primary" data-action="builder-create" onclick="handleAction('builder-create', this)" style="font-size:0.9rem;padding:0.7rem 1.5rem">
+            ✨ Создать такого же →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Freelancers -->
+<section id="freelancers">
+  <div class="container">
+    <div style="text-align:center">
+      <div class="section-label">Фрилансеры</div>
+      <h2 class="section-title">120+ проверенных AI-разработчиков</h2>
+      <p class="section-subtitle" style="margin-left:auto;margin-right:auto;margin-bottom:2.5rem">
+        Выбирайте по специализации, рейтингу или портфолио
+      </p>
+    </div>
+    <div class="cards-grid" id="freelancerGrid">
+      <!-- JS populate -->
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-label">Начните сегодня</div>
+    <h2 class="section-title">Ваш первый AI-агент<br>уже через 24 часа</h2>
+    <p style="color:var(--text2);margin-bottom:2.5rem;font-size:1.1rem">
+      Без предоплаты · Гарантия результата · Техподдержка после запуска
+    </p>
+    <button class="btn-primary" data-action="cta-order" onclick="handleAction('cta-order', this)" style="font-size:1.1rem;padding:1rem 2.5rem">
+      Оставить заявку бесплатно →
+    </button>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing">
+  <div class="container">
+    <div style="text-align:center">
+      <div class="section-label">Тарифы</div>
+      <h2 class="section-title">Простые цены</h2>
+      <p class="section-subtitle" style="margin-left:auto;margin-right:auto;margin-bottom:2.5rem">
+        Прозрачные условия. Оплата по факту. Никаких скрытых платежей.
+      </p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-name">Быстрый старт</div>
+        <div class="pricing-desc">Готовый AI-агент из каталога с минимальной кастомизацией</div>
+        <div class="pricing-price">от $49 <span></span></div>
+        <div class="pricing-period">единоразово</div>
+        <ul class="pricing-features">
+          <li>Выбор из каталога</li>
+          <li>Базовые настройки</li>
+          <li>Интеграция Telegram / Email</li>
+          <li>5 правок после запуска</li>
+          <li class="missing">Кастомная модель</li>
+          <li class="missing">Приоритетная поддержка</li>
+        </ul>
+        <button class="pricing-btn ghost" data-action="pricing-quickstart" data-plan="Быстрый старт" data-price="от $49" onclick="handleAction('pricing-quickstart', this)">Выбрать</button>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="pricing-name">Кастомный AI</div>
+        <div class="pricing-desc">Уникальный агент под задачу: от проектирования до запуска</div>
+        <div class="pricing-price">от $199 <span></span></div>
+        <div class="pricing-period">единоразово</div>
+        <ul class="pricing-features">
+          <li>Проектирование архитектуры</li>
+          <li>Обучение / fine-tuning</li>
+          <li>Интеграция с вашими системами</li>
+          <li>15 правок после запуска</li>
+          <li>30 дней техподдержки</li>
+          <li>Документация и обучение</li>
+        </ul>
+        <button class="pricing-btn primary" data-action="pricing-custom" data-plan="Кастомный AI" data-price="от $199" onclick="handleAction('pricing-custom', this)">Заказать</button>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-name">AI-платформа</div>
+        <div class="pricing-desc">Комплексное решение: множество агентов, аналитика, масштабирование</div>
+        <div class="pricing-price">от $699 <span></span></div>
+        <div class="pricing-period">единоразово</div>
+        <ul class="pricing-features">
+          <li>Архитектура с нуля</li>
+          <li>До 10 агентов</li>
+          <li>Аналитика и мониторинг</li>
+          <li>Безлимитные правки (30 дней)</li>
+          <li>DevOps и масштабирование</li>
+          <li> SLA 99.9%</li>
+        </ul>
+        <button class="pricing-btn ghost" data-action="pricing-platform" data-plan="AI-платформа" data-price="от $699" onclick="handleAction('pricing-platform', this)">Обсудить</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">AI<span>Market</span></div>
+      <p>Маркетплейс AI-решений на заказ. Запускаем умных агентов с 2024 года.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Каталог</h4>
+      <ul>
+        <li><a href="#">Чат-боты</a></li>
+        <li><a href="#">Автоматизация</a></li>
+        <li><a href="#">Аналитика</a></li>
+        <li><a href="#">Поддержка</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Платформа</h4>
+      <ul>
+        <li><a href="#">Конструктор</a></li>
+        <li><a href="#">Для фрилансеров</a></li>
+        <li><a href="#">API</a></li>
+        <li><a href="#">Документация</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Компания</h4>
+      <ul>
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Блог</a></li>
+        <li><a href="#">Контакты</a></li>
+        <li><a href="#">Соглашение</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2024–2026 AI Market. Все права защищены.</span>
+    <span>Сделано с нейросетями 🧠</span>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✅</span>
+  <span id="toastMsg">Заявка отправлена!</span>
+</div>
+
+<!-- Config status -->
+<div id="configBanner" style="display:none;position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#1a1a1a;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.85rem;font-weight:600;z-index:99;box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:90%;text-align:center"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const agents = [
+  { name: "SupportBot 3000", icon: "💬", cat: "support", color: "neon", tag: "Поддержка", price: "$99", desc: "Чат-бот для клиентской поддержки с автоответами, эскалацией и интеграцией с CRM" },
+  { name: "SalesMind", icon: "📈", cat: "marketing", color: "blue", tag: "Продажи", price: "$149", desc: "AI-консультант по продукту с квалификацией лидов и автоматизацией воронки продаж" },
+  { name: "DocParser", icon: "📄", cat: "data", color: "cyan", tag: "Документы", price: "$199", desc: "Автоматическое извлечение данных из PDF, сканов, таблиц. Распознавание и валидация." },
+  { name: "HR Assistant", icon: "👔", cat: "business", color: "orange", tag: "HR", price: "$249", desc: "Сортировка резюме, проведение первичных интервью, оценка кандидатов по критериям" },
+  { name: "SocialPilot", icon: "📱", cat: "marketing", color: "green", tag: "Соцсети", price: "$129", desc: "Генерация контент-плана, написание постов, анализ комментариев и ответы от имени бренда" },
+  { name: "DataWhale", icon: "🔍", cat: "data", color: "cyan", tag: "Аналитика", price: "$299", desc: "AI-аналитик: строит отчёты, находит аномалии, визуализирует данные из любых источников" },
+  { name: "VoiceGuide", icon: "🎙️", cat: "support", color: "neon", tag: "Голосовой", price: "$279", desc: "Голосовой ассистент для колл-центра: приём звонков, ответы, запись и анализ разговоров" },
+  { name: "LegalCheck", icon: "⚖️", cat: "business", color: "pink", tag: "Юриспруденция", price: "$349", desc: "Проверка договоров, поиск рисков, сравнение с типовыми шаблонами. Для юристов и бизнеса." },
+  { name: "RecoEngine", icon: "🎯", cat: "marketing", color: "blue", tag: "Рекомендации", price: "$399", desc: "Персональные рекомендации товаров, контента, услуг — для e-commerce, медиа, приложений" },
+  { name: "TaskBot", icon: "✅", cat: "business", color: "green", tag: "Автоматизация", price: "$149", desc: "AI-планировщик задач: приоритеты, напоминания, декомпозиция, отчёты о прогрессе" },
+  { name: "EmailGuardian", icon: "🛡️", cat: "data", color: "pink", tag: "Безопасность", price: "$179", desc: "Фильтрация спама, детекция фишинга, анализ вложений, защита корпоративной почты" },
+  { name: "MarketScanner", icon: "📊", cat: "marketing", color: "orange", tag: "Мониторинг", price: "$229", desc: "Мониторинг упоминаний бренда, конкурентов, трендов в соцсетях и СМИ с AI-анализом" },
+];
+
+const freelancers = [
+  { name: "Алексей К.", initials: "АК", role: "AI Engineer", stars: "★★★★★", tags: ["LLM", "RAG", "Python"], bio: "Специализируюсь на RAG-системах и fine-tuning. 5+ лет опыта с GPT, Claude, Llama. Интеграция с вашими данными.", rate: "от", price: "$25/час" },
+  { name: "Мария В.", initials: "МВ", role: "ML Developer", stars: "★★★★☆", tags: ["NLP", "TensorFlow", "Анализ"], bio: "NLP-проекты: чат-боты, классификация текста, sentiment analysis. Быстро и качественно.", rate: "от", price: "$20/час" },
+  { name: "Дмитрий С.", initials: "ДС", role: "Data Scientist", stars: "★★★★★", tags: ["LangChain", "API", "Автоматизация"], bio: "Строю AI-агенты на LangChain и LangGraph. Интеграция с CRM, ERP, Telegram.", rate: "от", price: "$30/час" },
+  { name: "Екатерина Н.", initials: "ЕН", role: "AI Product Manager", stars: "★★★★★", tags: ["Продукт", "Исследование", "MVP"], bio: "Проектирую AI-продукты с нуля: от идеи до MVP за 2 недели. Помогу сформулировать ТЗ.", rate: "от", price: "$18/час" },
+];
+
+// ═══════════════════════════════════════════════════════
+// TELEGRAM INTEGRATION
+// ═══════════════════════════════════════════════════════
+function isConfigured() {
+  if (typeof CONFIG === 'undefined') return false;
+  if (!CONFIG.telegram) return false;
+  if (!CONFIG.telegram.enabled) return false;
+  if (!CONFIG.telegram.botToken || CONFIG.telegram.botToken.startsWith('ЗДЕСЬ')) return false;
+  if (!CONFIG.telegram.chatId || CONFIG.telegram.chatId.startsWith('ЗДЕСЬ')) return false;
+  return true;
+}
+
+function getUTM() {
+  // Источник трафика
+  const ref = document.referrer || 'прямой переход';
+  const url = window.location.href;
+  return { ref, url };
+}
+
+function getDevice() {
+  return {
+    userAgent: navigator.userAgent,
+    lang: navigator.language,
+    screen: `${window.screen.width}×${window.screen.height}`,
+    online: navigator.onLine
+  };
+}
+
+async function sendToTelegram(message) {
+  if (!isConfigured()) {
+    if (CONFIG?.telegram?.debug) {
+      console.warn('Telegram не настроен. Сообщение:', message);
+    }
+    return { ok: false, reason: 'not_configured' };
+  }
+
+  const url = `https://api.telegram.org/bot${CONFIG.telegram.botToken}/sendMessage`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CONFIG.telegram.chatId,
+        text: message,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true
+      })
+    });
+    const data = await response.json();
+    if (CONFIG.telegram.debug) console.log('Telegram API:', data);
+    return data.ok ? { ok: true } : { ok: false, reason: data.description };
+  } catch (err) {
+    if (CONFIG.telegram.debug) console.error('Telegram error:', err);
+    return { ok: false, reason: err.message };
+  }
+}
+
+function fmtMoney(price) { return price || 'не указан'; }
+
+function fmtNow() {
+  const d = new Date();
+  return d.toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function buildMessage(emoji, title, body, extra = {}) {
+  let msg = `${emoji} <b>${title}</b>\n\n`;
+  msg += body;
+  if (Object.keys(extra).length) {
+    msg += '\n\n— — —\n';
+    for (const [k, v] of Object.entries(extra)) {
+      msg += `<i>${k}:</i> <code>${v}</code>\n`;
+    }
+  }
+  return msg;
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+function showToast(msg, kind = 'success') {
+  const toast = document.getElementById('toast');
+  const icon = document.getElementById('toastIcon');
+  document.getElementById('toastMsg').textContent = msg;
+  if (kind === 'warn') {
+    toast.style.borderColor = '#f59e0b';
+    icon.textContent = '⚠️';
+  } else if (kind === 'err') {
+    toast.style.borderColor = '#ef4444';
+    icon.textContent = '❌';
+  } else {
+    toast.style.borderColor = '#22c55e';
+    icon.textContent = '✅';
+  }
+  toast.classList.add('show');
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ═══════════════════════════════════════════════════════
+// BUTTON HANDLERS
+// ═══════════════════════════════════════════════════════
+function handleAction(action, btn) {
+  // Закрываем мобильное меню если открыто
+  document.getElementById('navLinks')?.classList.remove('open');
+
+  const tg = getUTM();
+  const dev = getDevice();
+  const common = {
+    'Действие': action,
+    'Время': fmtNow(),
+    'URL': tg.url,
+    'Источник': tg.ref || 'прямой',
+    'Браузер': dev.userAgent.substring(0, 80) + '...'
+  };
+
+  switch (action) {
+    case 'hero-order':
+    case 'nav-order':
+    case 'cta-order':
+    case 'builder-create':
+      // → Скроллим к форме + уведомление в TG
+      notifyQuick(action, common, btn);
+      scrollTo('order');
+      break;
+
+    case 'hero-catalog':
+      scrollTo('catalog');
+      break;
+
+    case 'catalog-card': {
+      const name = btn.dataset.name;
+      common['Агент'] = name;
+      notifyQuick('📦 Интерес к агенту', common, btn);
+      scrollTo('order');
+      // Подставляем тип агента в форму
+      const select = document.querySelector('#orderForm select');
+      if (select) select.value = 'Другое';
+      const desc = document.querySelector('#orderForm textarea');
+      if (desc) desc.value = `Интересует агент из каталога: «${name}».\n\nЧто нужно:`;
+      break;
+    }
+
+    case 'freelancer-select': {
+      const name = btn.dataset.name;
+      common['Фрилансер'] = name;
+      notifyQuick('👤 Выбрал фрилансера', common, btn);
+      scrollTo('order');
+      const desc = document.querySelector('#orderForm textarea');
+      if (desc) desc.value = `Хочу работать с фрилансером: ${name}.\n\nЗадача:`;
+      break;
+    }
+
+    case 'pricing-quickstart':
+    case 'pricing-custom':
+    case 'pricing-platform': {
+      const plan = btn.dataset.plan;
+      const price = btn.dataset.price;
+      common['Тариф'] = plan;
+      common['Цена'] = price;
+      notifyQuick('💰 Тариф', common, btn);
+      scrollTo('order');
+      const budget = document.getElementById('budgetSelect');
+      if (budget) {
+        if (price.includes('$49')) budget.value = 'small';
+        else if (price.includes('$199')) budget.value = 'medium';
+        else if (price.includes('$699')) budget.value = 'enterprise';
+      }
+      const desc = document.querySelector('#orderForm textarea');
+      if (desc) desc.value = `Тариф: ${plan} (${price})\n\nДетали:`;
+      break;
+    }
+  }
+}
+
+async function notifyQuick(title, common, btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    setTimeout(() => { btn.disabled = false; btn.style.opacity = ''; }, 2000);
+  }
+
+  if (!isConfigured()) return; // Молча: кнопка работает локально
+
+  const msg = buildMessage('🔔', title, '<i>Пользователь кликнул кнопку</i>', common);
+  const res = await sendToTelegram(msg);
+  if (res.ok) {
+    showToast('Заявка отправлена в Telegram!', 'success');
+  } else if (res.reason === 'not_configured') {
+    // не уведомляем, чтобы не спамить
+  } else {
+    showToast('Не удалось отправить: ' + res.reason, 'err');
+  }
+}
+
+function handleNavClick(id) {
+  document.getElementById('navLinks')?.classList.remove('open');
+  scrollTo(id);
+}
+
+// ═══════════════════════════════════════════════════════
+// FORM SUBMIT
+// ═══════════════════════════════════════════════════════
+async function submitOrder(e) {
+  e.preventDefault();
+  const form = e.target;
+  const fd = new FormData(form);
+
+  const data = {
+    name: fd.get('name') || form.querySelector('input[type="text"]').value,
+    email: fd.get('email') || form.querySelector('input[type="email"]').value,
+    telegram: form.querySelectorAll('input[type="text"]')[1]?.value || '—',
+    budget: form.querySelector('#budgetSelect').value || '—',
+    type: form.querySelectorAll('select')[1].value || '—',
+    description: form.querySelector('textarea').value,
+    participation: form.querySelectorAll('select')[2].value
+  };
+
+  // Кнопка в loading
+  const btn = form.querySelector('.form-submit');
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Отправляем...';
+
+  const tg = getUTM();
+  const dev = getDevice();
+
+  // Формируем красивое сообщение
+  const budgetLabels = {
+    '': 'не указан',
+    small: 'до $200',
+    medium: '$200 – $500',
+    large: '$500 – $1 500',
+    enterprise: 'от $1 500'
+  };
+
+  const msg = `🚀 <b>НОВАЯ ЗАЯВКА</b>
+
+👤 <b>Имя:</b> ${escapeHtml(data.name)}
+📧 <b>Email:</b> ${escapeHtml(data.email)}
+💬 <b>Telegram:</b> ${escapeHtml(data.telegram)}
+💰 <b>Бюджет:</b> ${budgetLabels[data.budget]}
+🎯 <b>Тип агента:</b> ${escapeHtml(data.type)}
+🤝 <b>Участие:</b> ${escapeHtml(data.participation)}
+
+📝 <b>Описание:</b>
+${escapeHtml(data.description)}
+
+— — —
+🕐 ${fmtNow()}
+🌐 <code>${tg.ref || 'прямой переход'}</code>
+💻 ${dev.screen}, ${dev.lang}`;
+
+  if (isConfigured()) {
+    const res = await sendToTelegram(msg);
+    if (res.ok) {
+      showToast('Заявка отправлена! Свяжемся в течение 2 часов 🚀');
+      form.reset();
+    } else {
+      showToast('Ошибка отправки: ' + res.reason, 'err');
+    }
+  } else {
+    // Не настроено — показываем превью
+    showConfigBanner();
+    console.log('Заявка (превью, TG не настроен):', msg);
+    showToast('Telegram не настроен — заявка в консоли', 'warn');
+    form.reset();
+  }
+
+  btn.textContent = orig;
+  btn.disabled = false;
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+function showConfigBanner() {
+  const banner = document.getElementById('configBanner');
+  banner.innerHTML = '⚠️ Telegram не настроен. Откройте <b>config.js</b> и укажите <code>botToken</code> + <code>chatId</code>';
+  banner.style.display = 'block';
+  setTimeout(() => banner.style.display = 'none', 8000);
+}
+
+// ═══════════════════════════════════════════════════════
+// SCROLL & UI
+// ═══════════════════════════════════════════════════════
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleMenu() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function renderCatalog(filter = 'all') {
+  const grid = document.getElementById('catalogGrid');
+  const filtered = filter === 'all' ? agents : agents.filter(a => a.cat === filter);
+  grid.innerHTML = filtered.map(a => `
+    <div class="card" data-action="catalog-card" data-name="${escapeHtml(a.name)}" onclick="handleAction('catalog-card', this)">
+      <div class="card-icon icon-${a.color}">${a.icon}</div>
+      <h3>${escapeHtml(a.name)}</h3>
+      <p>${escapeHtml(a.desc)}</p>
+      <div class="card-tag">${escapeHtml(a.tag)}</div>
+      <div class="card-price">от <strong>${escapeHtml(a.price)}</strong></div>
+    </div>
+  `).join('');
+}
+
+function filterCatalog(cat, btn) {
+  document.querySelectorAll('#catalog .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderCatalog(cat);
+}
+
+function renderFreelancers() {
+  const grid = document.getElementById('freelancerGrid');
+  grid.innerHTML = freelancers.map(f => `
+    <div class="freelancer-card">
+      <div class="freelancer-header">
+        <div class="freelancer-avatar">${f.initials}</div>
+        <div>
+          <div class="freelancer-name">${escapeHtml(f.name)}</div>
+          <div class="freelancer-role">${escapeHtml(f.role)}</div>
+          <div class="freelancer-stars">${f.stars}</div>
+        </div>
+      </div>
+      <div class="freelancer-tags">
+        ${f.tags.map(t => `<span class="freelancer-tag">${escapeHtml(t)}</span>`).join('')}
+      </div>
+      <div class="freelancer-bio">${escapeHtml(f.bio)}</div>
+      <div class="freelancer-footer">
+        <div class="freelancer-rate">${escapeHtml(f.rate)} <strong>${escapeHtml(f.price)}</strong></div>
+        <button class="freelancer-btn" data-action="freelancer-select" data-name="${escapeHtml(f.name)}" onclick="handleAction('freelancer-select', this)">Выбрать</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// BUILDER PRESETS
+// ═══════════════════════════════════════════════════════
+const builderPresets = {
+  support: `<span class="cm">// Поддержка клиентов v1.0</span>
+<span class="kw">trigger</span> <span class="fn">on_message</span>(<span class="str">"telegram"</span>)
+<span class="kw">step</span> <span class="fn">classify</span>(message, categories=[<span class="str">"вопрос"</span>, <span class="str">"жалоба"</span>, <span class="str">"заказ"</span>])
+<span class="kw">if</span> category == <span class="str">"жалоба"</span>:
+  <span class="kw">step</span> <span class="fn">summarize</span>(message, max_words=<span class="str">20</span>)
+  <span class="kw">step</span> <span class="fn">escalate</span>(team=<span class="str">"support"</span>, priority=<span class="str">"high"</span>)
+  <span class="kw">step</span> <span class="fn">reply</span>(<span class="str">"Принято! Уже работаем 🎯"</span>)
+<span class="kw">if</span> category == <span class="str">"вопрос"</span>:
+  <span class="kw">step</span> <span class="fn">search_kb</span>(query=message, top_k=<span class="str">3</span>)
+  <span class="kw">step</span> <span class="fn">reply</span>(answer, style=<span class="str">"friendly"</span>)
+<span class="kw">if</span> category == <span class="str">"заказ"</span>:
+  <span class="kw">step</span> <span class="fn">create_order</span>(data=message)
+  <span class="kw">step</span> <span class="fn">notify</span>(channel=<span class="str">"sales"</span>, message=order_id)`,
+
+  sales: `<span class="cm">// AI-консультант по продажам</span>
+<span class="kw">trigger</span> <span class="fn">on_lead</span>(source=<span class="str">"site"</span>)
+<span class="kw">step</span> <span class="fn">enrich</span>(email, sources=[<span class="str">"linkedin"</span>, <span class="str">"company_db"</span>])
+<span class="kw">step</span> <span class="fn">score</span>(lead, model=<span class="str">"propensity_to_buy_v2"</span>)
+<span class="kw">if</span> score > <span class="str">0.7</span>:
+  <span class="kw">step</span> <span class="fn">send_whatsapp</span>(message=personalized_offer)
+  <span class="kw">step</span> <span class="fn">schedule_call</span>(calendar=<span class="str">"sales_team"</span>)
+<span class="kw">if</span> score > <span class="str">0.3</span>:
+  <span class="kw">step</span> <span class="fn">send_email</span>(sequence=<span class="str">"nurture_7days"</span>)
+<span class="kw">else</span>:
+  <span class="kw">step</span> <span class="fn">add_to_newsletter</span>(list=<span class="str">"general"</span>)`,
+
+  analyze: `<span class="cm">// Аналитический агент данных</span>
+<span class="kw">trigger</span> <span class="fn">schedule</span>(<span class="str">"every day 08:00"</span>)
+<span class="kw">step</span> <span class="fn">fetch_data</span>(sources=[<span class="str">"db"</span>, <span class="str">"ga"</span>, <span class="str">"crm"</span>])
+<span class="kw">step</span> <span class="fn">detect_anomalies</span>(metrics=[<span class="str">"revenue"</span>, <span class="str">"churn"</span>, <span class="str">"cac"</span>])
+<span class="kw">step</span> <span class="fn">generate_digest</span>(format=<span class="str">"slack"</span>, include_graphs=<span class="str">true</span>)
+<span class="kw">if</span> anomaly detected:
+  <span class="kw">step</span> <span class="fn">alert</span>(channel=<span class="str">"#alerts"</span>, urgency=<span class="str">"high"</span>)
+  <span class="kw">step</span> <span class="fn">suggest_fix</span>(data=anomaly_context)`,
+
+  custom: `<span class="cm">// Ваш кастомный агент</span>
+<span class="kw">#</span> Опишите логику вашего агента
+<span class="kw">#</span> Шаг 1: Определите триггер
+<span class="kw">trigger</span> <span class="fn">on_trigger</span>(<span class="str">"ваше условие"</span>)
+<span class="kw">#</span> Шаг 2: Добавьте шаги
+<span class="kw">step</span> <span class="fn">your_action</span>(param=<span class="str">"value"</span>)
+<span class="kw">step</span> <span class="fn">ai_process</span>(prompt=<span class="str">"ваш запрос"</span>)
+<span class="kw">#</span> Шаг 3: Отправьте результат
+<span class="kw">step</span> <span class="fn">deliver</span>(output=<span class="str">"result"</span>, channel=<span class="str">"email"</span>)
+<span class="cm">// Хотите такого? Заполните форму →</span>`,
+};
+
+function setBuilderPreset(preset, btn) {
+  document.querySelectorAll('#builder .tabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('builderCode').innerHTML = builderPresets[preset];
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+renderCatalog();
+renderFreelancers();
+
+// Предупреждение если не настроено
+if (!isConfigured()) {
+  setTimeout(() => showConfigBanner(), 1500);
+}
+
+// Анимации при скролле
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('animate');
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('section').forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

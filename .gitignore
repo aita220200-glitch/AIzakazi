@@ -1,0 +1,10 @@
+# Config with secrets — never commit real tokens
+config.js
+config.local.js
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
